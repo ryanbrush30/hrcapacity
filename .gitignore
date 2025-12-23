@@ -53,3 +53,6 @@ __pycache__/
 
 # Artifacts (recommend: keep only curated samples)
 artifacts/
+
+# Proprietary decision configurations
+configs/
