@@ -1,7 +1,7 @@
 model:
   name: "HR Capacity Model"
   version: "0.1.0"
-  run_tags: ["dev", "step1-3"]
+  run_tags: ["dev", "step1-4"]
   timezone: "America/Los_Angeles"
 
 step1_decision_spec:
@@ -9,7 +9,7 @@ step1_decision_spec:
   horizon:
     start_date: "2026-01-01"
     periods: 13
-    frequency: "W-MON"   # weekly periods starting Monday
+    frequency: "W-MON"
   scope:
     in_scope:
       - workforce_growth
@@ -28,25 +28,17 @@ step1_decision_spec:
     human_in_loop_required: true
     no_individual_targeting: true
     intended_use: "Workforce planning and HR service capacity risk management"
-    prohibited_use: ["Individual employee actioning", "Disciplinary decision automation"]
+    prohibited_use:
+      - "Individual employee actioning"
+      - "Disciplinary decision automation"
 
 inputs:
-  # Workforce forecast is used for rate-based event counts.
   workforce_forecast:
     unit: "employees"
     by_period: [1500, 1505, 1510, 1520, 1530, 1540, 1545, 1550, 1560, 1570, 1580, 1590, 1600]
 
 step2_demand:
   load_unit: "service_hours"
-  # Event taxonomy with either fixed counts or rate-based counts.
-  # count_model:
-  #   type: "fixed"
-  #   counts_by_period: [...]
-  #
-  # or:
-  # count_model:
-  #   type: "rate_per_employee"
-  #   rate_per_employee_per_period: 0.01
   events:
     - event_type: "new_hire_onboarding"
       count_model:
@@ -73,6 +65,7 @@ step2_demand:
         hrops: 0.15
 
     - event_type: "leave_case"
+      locked_effort: true
       count_model:
         type: "rate_per_employee"
         rate_per_employee_per_period: 0.0015
@@ -85,7 +78,7 @@ step2_demand:
     - event_type: "er_case"
       count_model:
         type: "fixed"
-        counts_by_period: [2,2,2,3,2,3,2,2,3,2,2,3,2]
+        counts_by_period: [2, 2, 2, 3, 2, 3, 2, 2, 3, 2, 2, 3, 2]
       effort_hours:
         base: 10.0
       routing:
@@ -94,7 +87,7 @@ step2_demand:
     - event_type: "aca_reporting_spike"
       count_model:
         type: "fixed"
-        counts_by_period: [0,0,0,0,0,0,0,0,0,0,0,12,0]
+        counts_by_period: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0]
       effort_hours:
         base: 2.5
       routing:
@@ -105,19 +98,19 @@ step3_capacity:
   hours_per_fte_per_period: 40.0
   roles:
     recruiter:
-      fte_by_period: [3,3,3,3,3,3,3,3,3,3,3,3,3]
+      fte_by_period: [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]
       availability_factor: 0.72
       buffer_rate: 0.12
     hrbp:
-      fte_by_period: [4,4,4,4,4,4,4,4,4,4,4,4,4]
+      fte_by_period: [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
       availability_factor: 0.60
       buffer_rate: 0.15
     benefits:
-      fte_by_period: [2,2,2,2,2,2,2,2,2,2,2,2,2]
+      fte_by_period: [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
       availability_factor: 0.66
       buffer_rate: 0.15
     hrops:
-      fte_by_period: [2,2,2,2,2,2,2,2,2,2,2,2,2]
+      fte_by_period: [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
       availability_factor: 0.76
       buffer_rate: 0.10
 
@@ -125,3 +118,46 @@ step3_capacity:
     green_max_utilization: 0.80
     yellow_max_utilization: 0.95
 
+step4_scenarios:
+  enabled: true
+
+  constraints:
+    no_effort_reduction_events:
+      - "leave_case"
+
+  scenarios:
+    - name: "baseline"
+      description: "No changes"
+      patches: []
+
+    - name: "add_hrbp_0_5_fte_week5"
+      description: "Add 0.5 HRBP FTE starting period index 4 (week 5)"
+      patches:
+        - op: "set_fte_from_period"
+          path: "step3_capacity.roles.hrbp.fte_by_period"
+          start_period_index: 4
+          add: 0.5
+
+    - name: "recruiting_contractor_10hrs_weeks3to6"
+      description: "Add 10 scheduled hours per period to recruiter capacity for periods 2 to 5"
+      patches:
+        - op: "add_scheduled_hours_window"
+          role: "recruiter"
+          start_period_index: 2
+          end_period_index: 5
+          add_hours_per_period: 10
+
+    - name: "process_improvement_reduce_er_effort_15pct"
+      description: "Reduce ER case effort by 15%"
+      patches:
+        - op: "scale_event_effort"
+          event_type: "er_case"
+          factor: 0.85
+
+    - name: "hiring_freeze_reduce_onboarding_50pct"
+      description: "Reduce onboarding counts by 50% starting period index 3 (week 4)"
+      patches:
+        - op: "scale_event_counts_from_period"
+          event_type: "new_hire_onboarding"
+          start_period_index: 3
+          factor: 0.50

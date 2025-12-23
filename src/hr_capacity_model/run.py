@@ -9,6 +9,8 @@ from .governance import ensure_dir, write_json, input_fingerprint, dict_sha256, 
 from .step1_spec import build_decision_spec
 from .step2_demand import compute_demand_hours
 from .step3_capacity import compute_capacity_hours, compute_utilization_and_gaps
+from .step4_scenarios import load_scenarios, build_scenario_config
+
 
 
 def resolve_config(raw: Dict[str, Any]) -> Dict[str, Any]:
@@ -82,4 +84,81 @@ def run_model(config_path: str, artifacts_dir: str = "artifacts") -> Dict[str, s
         "artifacts_dir": out_dir,
         "manifest": os.path.join(out_dir, "manifest.json"),
         "totals": os.path.join(out_dir, "totals.csv"),
+    }
+
+def run_scenarios(config_path: str, artifacts_dir: str = "artifacts") -> Dict[str, str]:
+    raw = load_yaml(config_path)
+    resolved = resolve_config(raw)
+
+    scenarios = load_scenarios(resolved)
+
+    # Run baseline first using existing run_model
+    baseline_result = run_model(config_path=config_path, artifacts_dir=artifacts_dir)
+    baseline_dir = baseline_result["artifacts_dir"]
+
+    import pandas as pd
+    baseline_totals = pd.read_csv(os.path.join(baseline_dir, "totals.csv"))
+
+    if not scenarios:
+        return {"baseline_run_id": baseline_result["run_id"], "baseline_dir": baseline_dir}
+
+    # Create a scenarios folder under the baseline directory for clean lineage
+    scenarios_out = os.path.join(baseline_dir, "scenarios")
+    ensure_dir(scenarios_out)
+
+    summary_rows = []
+
+    for s in scenarios:
+        if s.name == "baseline":
+            continue
+
+        # Build patched config, write it, then run from that config object by temporarily saving a file
+        scenario_cfg = build_scenario_config(resolved, s)
+
+        scenario_cfg_path = os.path.join(scenarios_out, f"{s.name}.resolved_config.json")
+        write_json(scenario_cfg_path, scenario_cfg)
+
+        # Run scenario by temporarily writing a YAML alongside (simple approach)
+        # Better approach later: accept dict configs directly.
+        import yaml
+        scenario_yaml_path = os.path.join(scenarios_out, f"{s.name}.yaml")
+        with open(scenario_yaml_path, "w", encoding="utf-8") as f:
+            yaml.safe_dump(scenario_cfg, f, sort_keys=False)
+
+        scenario_result = run_model(config_path=scenario_yaml_path, artifacts_dir=scenarios_out)
+        scenario_dir = scenario_result["artifacts_dir"]
+
+        scenario_totals = pd.read_csv(os.path.join(scenario_dir, "totals.csv"))
+
+        # Compute delta summary (aggregate)
+        # Align by row order (same horizon)
+        d_util = (scenario_totals["utilization_total"] - baseline_totals["utilization_total"]).mean()
+        d_gap = (scenario_totals["gap_total_hours"] - baseline_totals["gap_total_hours"]).sum()
+
+        # Worst-week improvements
+        worst_base = baseline_totals["utilization_total"].max()
+        worst_scn = scenario_totals["utilization_total"].max()
+        worst_delta = worst_scn - worst_base
+
+        summary_rows.append(
+            {
+                "scenario": s.name,
+                "description": s.description,
+                "scenario_run_id": scenario_result["run_id"],
+                "scenario_dir": scenario_dir,
+                "mean_utilization_delta": d_util,
+                "total_gap_hours_delta_sum": d_gap,
+                "worst_week_utilization_baseline": worst_base,
+                "worst_week_utilization_scenario": worst_scn,
+                "worst_week_utilization_delta": worst_delta,
+            }
+        )
+
+    pd.DataFrame(summary_rows).to_csv(os.path.join(scenarios_out, "scenario_summary.csv"), index=False)
+
+    return {
+        "baseline_run_id": baseline_result["run_id"],
+        "baseline_dir": baseline_dir,
+        "scenarios_dir": scenarios_out,
+        "scenario_summary": os.path.join(scenarios_out, "scenario_summary.csv"),
     }

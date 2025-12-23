@@ -37,7 +37,13 @@ def _event_counts_by_period(
         r = float(count_model.get("rate_per_employee_per_period", 0.0))
         if len(workforce_by_period) != periods:
             raise ValueError("workforce_forecast.by_period length must equal periods.")
-        return [float(w) * r for w in workforce_by_period]
+        mult = float(count_model.get("multiplier", 1.0))
+        mult_start = int(count_model.get("multiplier_start_period_index", 0))
+        out = []
+        for i, w in enumerate(workforce_by_period):
+            m = mult if i >= mult_start else 1.0
+            out.append(float(w) * r * m)
+        return out
 
     raise ValueError(f"Unsupported count_model.type: {t}")
 
