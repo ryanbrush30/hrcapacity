@@ -71,6 +71,32 @@
       font-size: 16px;
     }
 
+    .toplinks {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .toplinks a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      text-decoration: none;
+      font-size: 13.5px;
+      box-shadow: var(--shadow);
+    }
+
+    .toplinks a:hover {
+      background: rgba(255,255,255,0.11);
+      text-decoration: none;
+    }
+
     .grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -79,9 +105,7 @@
     }
 
     @media (min-width: 880px) {
-      .grid {
-        grid-template-columns: 1.2fr 0.8fr;
-      }
+      .grid { grid-template-columns: 1.2fr 0.8fr; }
     }
 
     .card {
@@ -97,10 +121,7 @@
       font-size: 18px;
     }
 
-    .card p {
-      margin: 8px 0 0;
-      color: var(--muted);
-    }
+    .card p { margin: 8px 0 0; color: var(--muted); }
 
     .links {
       display: grid;
@@ -108,13 +129,8 @@
       margin-top: 12px;
     }
 
-    a {
-      color: var(--link);
-      text-decoration: none;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
+    a { color: var(--link); text-decoration: none; }
+    a:hover { text-decoration: underline; }
 
     .kvs {
       margin: 10px 0 0;
@@ -132,16 +148,8 @@
       background: rgba(0,0,0,0.12);
     }
 
-    .kv .k {
-      color: var(--muted);
-      font-family: var(--mono);
-      font-size: 12.5px;
-      letter-spacing: 0.2px;
-    }
-    .kv .v {
-      color: var(--text);
-      font-size: 13.5px;
-    }
+    .kv .k { color: var(--muted); font-family: var(--mono); font-size: 12.5px; letter-spacing: 0.2px; }
+    .kv .v { color: var(--text); font-size: 13.5px; }
 
     .pillrow {
       display: flex;
@@ -162,7 +170,6 @@
 
     .pill.ok { color: var(--ok); }
     .pill.warn { color: var(--warn); }
-    .pill.bad { color: var(--bad); }
 
     .hr {
       height: 1px;
@@ -170,25 +177,14 @@
       margin: 16px 0;
     }
 
-    code, pre {
-      font-family: var(--mono);
-      font-size: 12.5px;
-    }
-
-    pre {
-      background: rgba(0,0,0,0.18);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px;
-      overflow-x: auto;
-      margin: 10px 0 0;
-      color: #dbe5ff;
-    }
-
-    .foot {
-      margin-top: 22px;
+    .note {
+      border-left: 4px solid rgba(136,183,255,0.7);
+      padding: 10px 12px;
+      background: rgba(136,183,255,0.08);
+      border-radius: 10px;
+      margin-top: 12px;
       color: var(--muted);
-      font-size: 13px;
+      font-size: 13.5px;
     }
 
     .cta {
@@ -213,14 +209,10 @@
     }
     .btn:hover { text-decoration: none; background: rgba(255,255,255,0.11); }
 
-    .note {
-      border-left: 4px solid rgba(136,183,255,0.7);
-      padding: 10px 12px;
-      background: rgba(136,183,255,0.08);
-      border-radius: 10px;
-      margin-top: 12px;
+    .foot {
+      margin-top: 22px;
       color: var(--muted);
-      font-size: 13.5px;
+      font-size: 13px;
     }
   </style>
 </head>
@@ -239,6 +231,17 @@
         This repository contains sample outputs and input templates only.
         The execution engine and decision configurations are proprietary and intentionally excluded.
       </p>
+
+      <div class="toplinks">
+        <a href="https://github.com/ryanbrush30/hrcapacity" target="_blank" rel="noopener noreferrer">
+          <span aria-hidden="true">↗</span>
+          <span>View Repository</span>
+        </a>
+        <a href="./README.md">
+          <span aria-hidden="true">📄</span>
+          <span>README</span>
+        </a>
+      </div>
 
       <div class="pillrow">
         <div class="pill ok">Decision-grade</div>
@@ -268,8 +271,8 @@
             <div class="v">Worst-week utilization, plus cumulative gap hours and role-period utilization</div>
           </div>
           <div class="kv">
-            <div class="k">Governance posture</div>
-            <div class="v">No individual targeting; human-in-the-loop; prohibited uses declared</div>
+            <div class="k">Repository</div>
+            <div class="v"><a href="https://github.com/ryanbrush30/hrcapacity" target="_blank" rel="noopener noreferrer">github.com/ryanbrush30/hrcapacity</a></div>
           </div>
         </div>
 
@@ -291,3 +294,54 @@
           Tip: If any links 404, confirm the folder names match your repo. GitHub Pages is case-sensitive.
         </div>
       </section>
+
+      <aside class="card">
+        <h2>Repository contents</h2>
+        <p>Included here for transparency and review:</p>
+        <ul>
+          <li>Data input templates (CSV)</li>
+          <li>Curated sample outputs</li>
+          <li>Product framing and governance statements</li>
+        </ul>
+
+        <p><strong>Intentionally excluded:</strong></p>
+        <ul>
+          <li>Source code and execution engine</li>
+          <li>Production decision configurations</li>
+          <li>Full scenario catalog and tuning parameters</li>
+        </ul>
+
+        <div class="hr"></div>
+
+        <h2>Data templates</h2>
+        <p>These CSVs show the expected input structure for licensed deployments.</p>
+        <div class="links">
+          <a href="./data/workforce_forecast.csv">workforce_forecast.csv</a>
+          <a href="./data/capacity_schedule.csv">capacity_schedule.csv</a>
+          <a href="./data/events_config.csv">events_config.csv</a>
+          <a href="./data/fixed_event_counts.csv">fixed_event_counts.csv</a>
+          <a href="./data/routing_matrix.csv">routing_matrix.csv</a>
+        </div>
+
+        <div class="hr"></div>
+
+        <h2>Licensing</h2>
+        <p>
+          This repository does not grant rights to reproduce, reimplement, or derive a competing system.
+          Licensed access may include the execution engine, production configs, and scenario catalogs.
+        </p>
+
+        <div class="cta">
+          <a class="btn" href="https://github.com/ryanbrush30/hrcapacity" target="_blank" rel="noopener noreferrer">Repository</a>
+          <a class="btn" href="./README.md">README</a>
+        </div>
+      </aside>
+    </div>
+
+    <p class="foot">
+      Intellectual property notice: The HR Capacity Model execution engine is proprietary and not included.
+      Artifacts and templates in this repository are provided for review and licensed decision support only.
+    </p>
+  </div>
+</body>
+</html>
