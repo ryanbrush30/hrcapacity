@@ -10,12 +10,50 @@ from .step1_spec import build_decision_spec
 from .step2_demand import compute_demand_hours
 from .step3_capacity import compute_capacity_hours, compute_utilization_and_gaps
 from .step4_scenarios import load_scenarios, build_scenario_config
-
+from .data_io import (
+    load_workforce_forecast,
+    load_capacity_schedule,
+    load_events_config,
+)
 
 
 def resolve_config(raw: Dict[str, Any]) -> Dict[str, Any]:
-    # Placeholder for future resolution logic (defaults, env overrides, schema checks).
-    return deep_copy(raw)
+    cfg = deep_copy(raw)
+
+    # If no data_files block, behave like before (YAML is already resolved)
+    data_files = cfg.get("data_files")
+    if not data_files:
+        return cfg
+
+    # 1) Workforce forecast
+    wf_path = data_files.get("workforce_forecast_csv")
+    if wf_path:
+        cfg.setdefault("inputs", {})
+        cfg["inputs"]["workforce_forecast"] = load_workforce_forecast(wf_path)
+
+    # 2) Capacity schedule (roles)
+    cap_path = data_files.get("capacity_schedule_csv")
+    if cap_path:
+        roles = load_capacity_schedule(cap_path)
+        cfg.setdefault("step3_capacity", {})
+        cfg["step3_capacity"].setdefault("roles", {})
+        cfg["step3_capacity"]["roles"] = roles
+
+    # 3) Events (taxonomy + counts + routing)
+    events_cfg_path = data_files.get("events_config_csv")
+    routing_path = data_files.get("routing_matrix_csv")
+    fixed_counts_path = data_files.get("fixed_event_counts_csv")
+
+    if events_cfg_path and routing_path and fixed_counts_path:
+        events = load_events_config(
+            events_config_path=events_cfg_path,
+            routing_matrix_path=routing_path,
+            fixed_counts_path=fixed_counts_path,
+        )
+        cfg.setdefault("step2_demand", {})
+        cfg["step2_demand"]["events"] = events
+
+    return cfg
 
 
 def run_model(config_path: str, artifacts_dir: str = "artifacts") -> Dict[str, str]:
@@ -45,8 +83,14 @@ def run_model(config_path: str, artifacts_dir: str = "artifacts") -> Dict[str, s
     out_dir = os.path.join(artifacts_dir, run_id)
     ensure_dir(out_dir)
 
-    # Governance artifacts
-    fp = input_fingerprint([config_path])
+    # Governance artifacts: fingerprint ALL inputs (yaml + any referenced data files)
+    input_files = [config_path]
+    data_files = bundle.resolved.get("data_files", {}) or {}
+    for _, v in data_files.items():
+        if isinstance(v, str) and v.strip():
+            input_files.append(v)
+
+    fp = input_fingerprint(input_files)
     resolved_hash = dict_sha256(bundle.resolved)
 
     manifest = {

@@ -4,6 +4,13 @@ model:
   run_tags: ["dev", "step1-4"]
   timezone: "America/Los_Angeles"
 
+data_files:
+  workforce_forecast_csv: "data/workforce_forecast.csv"
+  capacity_schedule_csv: "data/capacity_schedule.csv"
+  events_config_csv: "data/events_config.csv"
+  fixed_event_counts_csv: "data/fixed_event_counts.csv"
+  routing_matrix_csv: "data/routing_matrix.csv"
+
 step1_decision_spec:
   decision_statement: "Will HR service demand exceed sustainable capacity within the planning horizon, and where should leadership intervene to prevent operational risk?"
   horizon:
