@@ -1,0 +1,6 @@
+event_type,count_model_type,rate_per_employee_per_period,counts_file,effort_hours_base,locked_effort
+new_hire_onboarding,rate_per_employee,0.004,,2.0,False
+termination,rate_per_employee,0.0025,,1.5,False
+leave_case,rate_per_employee,0.0015,,4.0,True
+er_case,fixed,,fixed_event_counts.csv,10.0,False
+aca_reporting_spike,fixed,,fixed_event_counts.csv,2.5,False

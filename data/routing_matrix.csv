@@ -1,0 +1,14 @@
+event_type,role,route_share
+new_hire_onboarding,recruiter,0.6
+new_hire_onboarding,hrbp,0.15
+new_hire_onboarding,benefits,0.15
+new_hire_onboarding,hrops,0.1
+termination,hrbp,0.55
+termination,recruiter,0.2
+termination,benefits,0.1
+termination,hrops,0.15
+leave_case,benefits,0.8
+leave_case,hrbp,0.2
+er_case,hrbp,1.0
+aca_reporting_spike,hrops,0.7
+aca_reporting_spike,benefits,0.3

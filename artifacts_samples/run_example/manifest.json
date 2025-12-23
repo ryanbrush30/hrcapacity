@@ -1,0 +1,32 @@
+{
+  "created_utc": "2025-12-23T19:24:05.414687+00:00",
+  "decision_statement": "Will HR service demand exceed sustainable capacity within the planning horizon, and where should leadership intervene to prevent operational risk?",
+  "horizon": {
+    "frequency": "W-MON",
+    "periods": 13,
+    "start_date": "2026-01-01"
+  },
+  "input_fingerprint": {
+    "configs\\base.yaml": "866465e8484c7b6d2a4c75b414895c3bc574285395a7296f920934e6342b9a2a",
+    "data/capacity_schedule.csv": "79c874e08ca7dab31f4fae6f3b3d5bed5afe359f22bdb22f555093ca52471991",
+    "data/events_config.csv": "90d6336ad4e8aaae5e7505ed7928f91cca215f1f086fe63a19c6587b8621bec0",
+    "data/fixed_event_counts.csv": "f6cc5410fcfe9a8d87d033a2e3e57ea85bd99a2318f912df9ce6a9e58fa5d6a4",
+    "data/routing_matrix.csv": "0ff997cd0a866e5c2bb1465f70c2eb042d381e8d53c4f69320ea81de542dd2f9",
+    "data/workforce_forecast.csv": "8449a72927a0ef53eb956dfea4321e60d8efb3d6fae80537004ba2267cb997c4"
+  },
+  "model": {
+    "name": "HR Capacity Model",
+    "run_tags": [
+      "dev",
+      "step1-4"
+    ],
+    "timezone": "America/Los_Angeles",
+    "version": "0.1.0"
+  },
+  "prohibited_use": [
+    "Individual employee actioning",
+    "Disciplinary decision automation"
+  ],
+  "resolved_config_sha256": "3fed2a488bf675b903b525d4827c7b41e3643762780722245bee52f2647436f4",
+  "run_id": "run_2026-01-01_2025-12-23T192405413448+0000"
+}
