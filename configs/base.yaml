@@ -1,7 +1,127 @@
 model:
-  projected_load_hours: 520.0
-  sustainable_capacity_hours: 480.0
+  name: "HR Capacity Model"
+  version: "0.1.0"
+  run_tags: ["dev", "step1-3"]
+  timezone: "America/Los_Angeles"
 
-governance:
-  min_reporting_group_size: 25
-  allow_individual_outputs: false
+step1_decision_spec:
+  decision_statement: "Will HR service demand exceed sustainable capacity within the planning horizon, and where should leadership intervene to prevent operational risk?"
+  horizon:
+    start_date: "2026-01-01"
+    periods: 13
+    frequency: "W-MON"   # weekly periods starting Monday
+  scope:
+    in_scope:
+      - workforce_growth
+      - attrition
+      - leaves
+      - hiring
+      - benefits_lifecycle
+      - employee_relations
+      - compliance_reporting
+    out_of_scope:
+      - individual_targeting
+      - performance_evaluation
+      - auto_decisioning
+      - manager_blame_attribution
+  governance:
+    human_in_loop_required: true
+    no_individual_targeting: true
+    intended_use: "Workforce planning and HR service capacity risk management"
+    prohibited_use: ["Individual employee actioning", "Disciplinary decision automation"]
+
+inputs:
+  # Workforce forecast is used for rate-based event counts.
+  workforce_forecast:
+    unit: "employees"
+    by_period: [1500, 1505, 1510, 1520, 1530, 1540, 1545, 1550, 1560, 1570, 1580, 1590, 1600]
+
+step2_demand:
+  load_unit: "service_hours"
+  # Event taxonomy with either fixed counts or rate-based counts.
+  # count_model:
+  #   type: "fixed"
+  #   counts_by_period: [...]
+  #
+  # or:
+  # count_model:
+  #   type: "rate_per_employee"
+  #   rate_per_employee_per_period: 0.01
+  events:
+    - event_type: "new_hire_onboarding"
+      count_model:
+        type: "rate_per_employee"
+        rate_per_employee_per_period: 0.004
+      effort_hours:
+        base: 2.0
+      routing:
+        recruiter: 0.60
+        hrbp: 0.15
+        benefits: 0.15
+        hrops: 0.10
+
+    - event_type: "termination"
+      count_model:
+        type: "rate_per_employee"
+        rate_per_employee_per_period: 0.0025
+      effort_hours:
+        base: 1.5
+      routing:
+        hrbp: 0.55
+        recruiter: 0.20
+        benefits: 0.10
+        hrops: 0.15
+
+    - event_type: "leave_case"
+      count_model:
+        type: "rate_per_employee"
+        rate_per_employee_per_period: 0.0015
+      effort_hours:
+        base: 4.0
+      routing:
+        benefits: 0.80
+        hrbp: 0.20
+
+    - event_type: "er_case"
+      count_model:
+        type: "fixed"
+        counts_by_period: [2,2,2,3,2,3,2,2,3,2,2,3,2]
+      effort_hours:
+        base: 10.0
+      routing:
+        hrbp: 1.0
+
+    - event_type: "aca_reporting_spike"
+      count_model:
+        type: "fixed"
+        counts_by_period: [0,0,0,0,0,0,0,0,0,0,0,12,0]
+      effort_hours:
+        base: 2.5
+      routing:
+        hrops: 0.70
+        benefits: 0.30
+
+step3_capacity:
+  hours_per_fte_per_period: 40.0
+  roles:
+    recruiter:
+      fte_by_period: [3,3,3,3,3,3,3,3,3,3,3,3,3]
+      availability_factor: 0.72
+      buffer_rate: 0.12
+    hrbp:
+      fte_by_period: [4,4,4,4,4,4,4,4,4,4,4,4,4]
+      availability_factor: 0.60
+      buffer_rate: 0.15
+    benefits:
+      fte_by_period: [2,2,2,2,2,2,2,2,2,2,2,2,2]
+      availability_factor: 0.66
+      buffer_rate: 0.15
+    hrops:
+      fte_by_period: [2,2,2,2,2,2,2,2,2,2,2,2,2]
+      availability_factor: 0.76
+      buffer_rate: 0.10
+
+  sustainability_thresholds:
+    green_max_utilization: 0.80
+    yellow_max_utilization: 0.95
+

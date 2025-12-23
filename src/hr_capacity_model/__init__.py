@@ -1,3 +1,2 @@
-from hr_capacity_model.version import __version__
-
-__all__ = ["__version__"]
+__all__ = ["run_model"]
+from .run import run_model

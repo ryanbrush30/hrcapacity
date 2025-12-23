@@ -1,13 +1,21 @@
-# HR Capacity Model
+# HR Capacity Model (Steps 1–3)
 
-Decision-grade model to forecast HR capacity pressure by modeling future HR load (events) versus sustainable capacity.
+Config-driven decision-grade HR capacity load vs capacity.
 
-## Quickstart
+## Install (editable)
+pip install -e .
 
-Create venv and install:
-```bash
-python -m venv .venv
-# Windows: .venv\Scripts\activate
-# macOS/Linux: source .venv/bin/activate
-pip install -e ".[dev]"
-pre-commit install
+## Run
+hrcm --config configs/base.yaml --artifacts artifacts
+
+## Outputs
+artifacts/<run_id>/
+- manifest.json
+- resolved_config.json
+- demand_by_role_period.csv
+- demand_event_detail.csv
+- capacity_by_role_period.csv
+- capacity_detail.csv
+- utilization_by_role_period.csv
+- capacity_gap_by_role_period.csv
+- totals.csv
