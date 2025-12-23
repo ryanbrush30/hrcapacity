@@ -10,6 +10,7 @@ from .step1_spec import build_decision_spec
 from .step2_demand import compute_demand_hours
 from .step3_capacity import compute_capacity_hours, compute_utilization_and_gaps
 from .step4_scenarios import load_scenarios, build_scenario_config
+from .validate import validate_resolved_config
 from .data_io import (
     load_workforce_forecast,
     load_capacity_schedule,
@@ -23,6 +24,7 @@ def resolve_config(raw: Dict[str, Any]) -> Dict[str, Any]:
     # If no data_files block, behave like before (YAML is already resolved)
     data_files = cfg.get("data_files")
     if not data_files:
+        validate_resolved_config(cfg)
         return cfg
 
     # 1) Workforce forecast

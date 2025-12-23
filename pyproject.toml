@@ -20,3 +20,7 @@ package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[project.scripts]
+hrcm = "hr_capacity_model.cli:main"
+hrcm-validate = "hr_capacity_model.validate_cli:main"
