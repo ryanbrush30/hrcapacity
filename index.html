@@ -214,6 +214,36 @@
       color: var(--muted);
       font-size: 13px;
     }
+
+    /* Executive section */
+    .exec h3 {
+      margin: 14px 0 8px;
+      font-size: 15px;
+      letter-spacing: 0.2px;
+    }
+
+    .exec ul {
+      margin: 8px 0 0;
+      padding-left: 18px;
+      color: var(--muted);
+    }
+
+    .exec li { margin: 6px 0; }
+
+    .filetag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--mono);
+      font-size: 12.5px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,0.12);
+      color: var(--text);
+      width: fit-content;
+      margin-top: 8px;
+    }
   </style>
 </head>
 
@@ -272,7 +302,11 @@
           </div>
           <div class="kv">
             <div class="k">Repository</div>
-            <div class="v"><a href="https://github.com/ryanbrush30/hrcapacity" target="_blank" rel="noopener noreferrer">github.com/ryanbrush30/hrcapacity</a></div>
+            <div class="v">
+              <a href="https://github.com/ryanbrush30/hrcapacity" target="_blank" rel="noopener noreferrer">
+                github.com/ryanbrush30/hrcapacity
+              </a>
+            </div>
           </div>
         </div>
 
@@ -281,6 +315,7 @@
         <h2>Sample artifacts</h2>
         <p>
           The files below demonstrate the artifact set produced by a validated run. These are examples for review.
+          They are aggregated and governance-safe.
         </p>
 
         <div class="links">
@@ -292,6 +327,56 @@
 
         <div class="note">
           Tip: If any links 404, confirm the folder names match your repo. GitHub Pages is case-sensitive.
+        </div>
+
+        <div class="hr"></div>
+
+        <h2>Executive guide: how to read the sample artifacts</h2>
+        <p>
+          These outputs represent a validated HR Capacity Model run. They are intended to support leadership decisions
+          about sustainable HR capacity, timing of service pressure, and which interventions reduce operational risk.
+          They are not intended for individual employee actioning.
+        </p>
+
+        <div class="exec">
+          <h3>Start here: Scenario summary</h3>
+          <div class="filetag">File: scenario_summary.csv</div>
+          <ul>
+            <li><strong>Worst-week utilization</strong>: the most decision-relevant metric. Peak overload drives service delays and operational risk more than average utilization.</li>
+            <li><strong>Total gap hours</strong>: cumulative demand that cannot be serviced within sustainable capacity. Proxy for backlog growth and delay risk.</li>
+            <li><strong>Interpretation</strong>: lower is better for both. Scenarios that reduce the peak usually reduce risk more than scenarios that only improve totals.</li>
+          </ul>
+
+          <h3>Then review: Utilization by role and period</h3>
+          <div class="filetag">File: utilization_by_role_period.csv</div>
+          <ul>
+            <li>Identify the constrained roles and timing patterns (short peak vs sustained pressure).</li>
+            <li>Confirm whether interventions reduce load or shift burden to other roles.</li>
+            <li><strong>Leadership use</strong>: prioritize targeted capacity adds, sequencing changes, or demand moderation policies.</li>
+          </ul>
+
+          <h3>Totals</h3>
+          <div class="filetag">File: totals.csv</div>
+          <ul>
+            <li>High-level summary of aggregate demand vs sustainable capacity over the planning horizon.</li>
+            <li>Use totals to explain magnitude. Use worst-week utilization to determine when it becomes operationally dangerous.</li>
+          </ul>
+
+          <h3>Manifest</h3>
+          <div class="filetag">File: manifest.json</div>
+          <ul>
+            <li>Governance and audit record: run metadata, input fingerprinting, resolved configuration hash.</li>
+            <li>Declared governance constraints and prohibited uses to prevent misuse and ensure traceability.</li>
+            <li><strong>Leadership use</strong>: ensures results can be trusted and reproduced without spreadsheet drift.</li>
+          </ul>
+
+          <h3>Decision logic for executives</h3>
+          <ul>
+            <li>Do we exceed sustainable capacity at any point in the planning horizon?</li>
+            <li>Which scenario reduces worst-week utilization the most with minimal operational disruption?</li>
+            <li>Does the scenario reduce pressure in the constrained role, or does it only shift burden elsewhere?</li>
+            <li>Are the interventions realistic to execute and governance-safe in intended use?</li>
+          </ul>
         </div>
       </section>
 
