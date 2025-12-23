@@ -139,15 +139,13 @@ def apply_patch(cfg: Dict[str, Any], patch: Dict[str, Any]) -> None:
             return
 
         if cm_type == "rate_per_employee":
-            # Add a multiplier field and use it in step2 later.
+            # Store a multiplier that step2 will honor starting at start_period_index
             mult = float(cm.get("multiplier", 1.0))
             cm["multiplier"] = mult * factor
             cm["multiplier_start_period_index"] = start
             return
 
         raise ValueError(f"Unsupported count_model.type for scaling: {cm_type}")
-
-    raise ValueError(f"Unsupported patch op: {op}")
 
 
 def load_scenarios(cfg: Dict[str, Any]) -> List[Scenario]:
