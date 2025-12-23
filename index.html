@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HR Capacity Model | Decision-Grade Capacity Intelligence</title>
+  <meta name="description" content="Licensable, decision-grade HR service capacity forecasting with scenario analysis. This repo contains sample artifacts only. Source code and decision configs are proprietary." />
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #101a33;
+      --text: #e8ecf6;
+      --muted: #b9c2d9;
+      --link: #88b7ff;
+      --ok: #77e0a3;
+      --warn: #ffd37a;
+      --bad: #ff8e8e;
+      --border: rgba(255,255,255,0.10);
+      --shadow: 0 10px 30px rgba(0,0,0,0.35);
+      --radius: 14px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      background: radial-gradient(1200px 800px at 20% 10%, rgba(136,183,255,0.18), transparent 60%),
+                  radial-gradient(900px 600px at 90% 20%, rgba(119,224,163,0.12), transparent 55%),
+                  var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+    }
+
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 44px 18px 70px;
+    }
+
+    header {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 26px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid var(--border);
+      padding: 7px 10px;
+      border-radius: 999px;
+      width: fit-content;
+      box-shadow: var(--shadow);
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 34px;
+      letter-spacing: 0.2px;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      max-width: 74ch;
+      font-size: 16px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    @media (min-width: 880px) {
+      .grid {
+        grid-template-columns: 1.2fr 0.8fr;
+      }
+    }
+
+    .card {
+      background: rgba(16,26,51,0.78);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .card h2 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    .card p {
+      margin: 8px 0 0;
+      color: var(--muted);
+    }
+
+    .links {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    a {
+      color: var(--link);
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .kvs {
+      margin: 10px 0 0;
+      display: grid;
+      gap: 8px;
+    }
+
+    .kv {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 10px;
+      padding: 10px 10px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: rgba(0,0,0,0.12);
+    }
+
+    .kv .k {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 12.5px;
+      letter-spacing: 0.2px;
+    }
+    .kv .v {
+      color: var(--text);
+      font-size: 13.5px;
+    }
+
+    .pillrow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .pill {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.06);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      color: var(--muted);
+      width: fit-content;
+    }
+
+    .pill.ok { color: var(--ok); }
+    .pill.warn { color: var(--warn); }
+    .pill.bad { color: var(--bad); }
+
+    .hr {
+      height: 1px;
+      background: var(--border);
+      margin: 16px 0;
+    }
+
+    code, pre {
+      font-family: var(--mono);
+      font-size: 12.5px;
+    }
+
+    pre {
+      background: rgba(0,0,0,0.18);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      overflow-x: auto;
+      margin: 10px 0 0;
+      color: #dbe5ff;
+    }
+
+    .foot {
+      margin-top: 22px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .cta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      text-decoration: none;
+      font-size: 13.5px;
+      box-shadow: var(--shadow);
+    }
+    .btn:hover { text-decoration: none; background: rgba(255,255,255,0.11); }
+
+    .note {
+      border-left: 4px solid rgba(136,183,255,0.7);
+      padding: 10px 12px;
+      background: rgba(136,183,255,0.08);
+      border-radius: 10px;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 13.5px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div class="badge">
+        <span aria-hidden="true">🔒</span>
+        <span>Licensable product | artifacts-only repository</span>
+      </div>
+
+      <h1>HR Capacity Model</h1>
+      <p class="subtitle">
+        Decision-grade HR service capacity forecasting with scenario analysis and governance-safe artifacts.
+        This repository contains sample outputs and input templates only.
+        The execution engine and decision configurations are proprietary and intentionally excluded.
+      </p>
+
+      <div class="pillrow">
+        <div class="pill ok">Decision-grade</div>
+        <div class="pill ok">Audit artifacts</div>
+        <div class="pill ok">Scenario analysis</div>
+        <div class="pill warn">No source code</div>
+        <div class="pill warn">No configs</div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <section class="card">
+        <h2>What this product does</h2>
+        <p>
+          The HR Capacity Model forecasts HR service load versus sustainable capacity across a planning horizon,
+          surfaces peak risk (worst-week utilization), and evaluates leadership interventions as scenarios.
+          It is designed for executive planning and governance review, not individual-level actioning.
+        </p>
+
+        <div class="kvs">
+          <div class="kv">
+            <div class="k">Primary decision</div>
+            <div class="v">Will HR demand exceed sustainable capacity, and what interventions prevent operational risk?</div>
+          </div>
+          <div class="kv">
+            <div class="k">Key metric</div>
+            <div class="v">Worst-week utilization, plus cumulative gap hours and role-period utilization</div>
+          </div>
+          <div class="kv">
+            <div class="k">Governance posture</div>
+            <div class="v">No individual targeting; human-in-the-loop; prohibited uses declared</div>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <h2>Sample artifacts</h2>
+        <p>
+          The files below demonstrate the artifact set produced by a validated run. These are examples for review.
+        </p>
+
+        <div class="links">
+          <a href="./artifacts_samples/run_example/scenario_summary.csv">Scenario summary (CSV)</a>
+          <a href="./artifacts_samples/run_example/totals.csv">Totals (CSV)</a>
+          <a href="./artifacts_samples/run_example/utilization_by_role_period.csv">Utilization by role and period (CSV)</a>
+          <a href="./artifacts_samples/run_example/manifest.json">Manifest (JSON)</a>
+        </div>
+
+        <div class="note">
+          Tip: If any links 404, confirm the folder names match your repo. GitHub Pages is case-sensitive.
+        </div>
+      </section>
