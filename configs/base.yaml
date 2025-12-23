@@ -1,0 +1,7 @@
+model:
+  projected_load_hours: 520.0
+  sustainable_capacity_hours: 480.0
+
+governance:
+  min_reporting_group_size: 25
+  allow_individual_outputs: false
