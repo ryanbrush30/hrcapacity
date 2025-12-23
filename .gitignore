@@ -34,3 +34,22 @@ artifacts/runs/
 # Secrets
 .env
 *.env
+
+# Exclude source code
+src/
+**/*.py
+**/*.ipynb
+
+# Environments / IDE
+.venv/
+.idea/
+.vscode/
+
+# Python cache
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+
+# Artifacts (recommend: keep only curated samples)
+artifacts/
