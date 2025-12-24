@@ -1,6 +1,10 @@
 **HR Capacity Model**
 **Decision-Grade Workforce Capacity Intelligence (Licensable Product)**
 
+**Future Questions to Evaluate**
+two new leaders can join under similar conditions, yet one may leave structures largely intact while another wants to revisit reporting lines and role design. 
+Headcount doesn’t change, but the HR effort required can look very different.
+
 **Overview**
 The HR Capacity Model is a decision-grade workforce and HR service capacity modeling product designed for executive planning, operational risk management, and scenario-based decision support.
 This repository contains licensed artifacts only:
