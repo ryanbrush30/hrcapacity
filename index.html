@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HR Capacity Model | Decision-Grade Capacity Intelligence</title>
+  <meta name="description" content="Licensable, decision-grade HR service capacity forecasting with scenario analysis. This repo contains sample artifacts only. Source code and decision configs are proprietary." />
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #101a33;
+      --text: #e8ecf6;
+      --muted: #b9c2d9;
+      --link: #88b7ff;
+      --ok: #77e0a3;
+      --warn: #ffd37a;
+      --bad: #ff8e8e;
+      --border: rgba(255,255,255,0.10);
+      --shadow: 0 10px 30px rgba(0,0,0,0.35);
+      --radius: 14px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      background: radial-gradient(1200px 800px at 20% 10%, rgba(136,183,255,0.18), transparent 60%),
+                  radial-gradient(900px 600px at 90% 20%, rgba(119,224,163,0.12), transparent 55%),
+                  var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+    }
+
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 44px 18px 70px;
+    }
+
+    header {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 26px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid var(--border);
+      padding: 7px 10px;
+      border-radius: 999px;
+      width: fit-content;
+      box-shadow: var(--shadow);
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 34px;
+      letter-spacing: 0.2px;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      max-width: 74ch;
+      font-size: 16px;
+    }
+
+    .toplinks {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .toplinks a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      text-decoration: none;
+      font-size: 13.5px;
+      box-shadow: var(--shadow);
+    }
+
+    .toplinks a:hover {
+      background: rgba(255,255,255,0.11);
+      text-decoration: none;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    @media (min-width: 880px) {
+      .grid { grid-template-columns: 1.2fr 0.8fr; }
+    }
+
+    .card {
+      background: rgba(16,26,51,0.78);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .card h2 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    .card p { margin: 8px 0 0; color: var(--muted); }
+
+    .links {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    a { color: var(--link); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .kvs {
+      margin: 10px 0 0;
+      display: grid;
+      gap: 8px;
+    }
+
+    .kv {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 10px;
+      padding: 10px 10px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: rgba(0,0,0,0.12);
+    }
+
+    .kv .k { color: var(--muted); font-family: var(--mono); font-size: 12.5px; letter-spacing: 0.2px; }
+    .kv .v { color: var(--text); font-size: 13.5px; }
+
+    .pillrow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .pill {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.06);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      color: var(--muted);
+      width: fit-content;
+    }
+
+    .pill.ok { color: var(--ok); }
+    .pill.warn { color: var(--warn); }
+
+    .hr {
+      height: 1px;
+      background: var(--border);
+      margin: 16px 0;
+    }
+
+    .note {
+      border-left: 4px solid rgba(136,183,255,0.7);
+      padding: 10px 12px;
+      background: rgba(136,183,255,0.08);
+      border-radius: 10px;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 13.5px;
+    }
+
+    .cta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      text-decoration: none;
+      font-size: 13.5px;
+      box-shadow: var(--shadow);
+    }
+    .btn:hover { text-decoration: none; background: rgba(255,255,255,0.11); }
+
+    .foot {
+      margin-top: 22px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* Executive section */
+    .exec h3 {
+      margin: 14px 0 8px;
+      font-size: 15px;
+      letter-spacing: 0.2px;
+    }
+
+    .exec ul {
+      margin: 8px 0 0;
+      padding-left: 18px;
+      color: var(--muted);
+    }
+
+    .exec li { margin: 6px 0; }
+
+    .filetag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--mono);
+      font-size: 12.5px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,0.12);
+      color: var(--text);
+      width: fit-content;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div class="badge">
+        <span aria-hidden="true">🔒</span>
+        <span>Licensable product | artifacts-only repository</span>
+      </div>
+
+      <h1>HR Capacity Model</h1>
+      <p class="subtitle">
+        Decision-grade HR service capacity forecasting with scenario analysis and governance-safe artifacts.
+        This repository contains sample outputs and input templates only.
+        The execution engine and decision configurations are proprietary and intentionally excluded.
+      </p>
+
+      <div class="toplinks">
+        <a href="https://github.com/ryanbrush30/hrcapacity" target="_blank" rel="noopener noreferrer">
+          <span aria-hidden="true">↗</span>
+          <span>View Repository</span>
+        </a>
+        <a href="./README.md">
+          <span aria-hidden="true">📄</span>
+          <span>README</span>
+        </a>
+      </div>
+
+      <div class="pillrow">
+        <div class="pill ok">Decision-grade</div>
+        <div class="pill ok">Audit artifacts</div>
+        <div class="pill ok">Scenario analysis</div>
+        <div class="pill warn">No source code</div>
+        <div class="pill warn">No configs</div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <section class="card">
+        <h2>What this product does</h2>
+        <p>
+          The HR Capacity Model forecasts HR service load versus sustainable capacity across a planning horizon,
+          surfaces peak risk (worst-week utilization), and evaluates leadership interventions as scenarios.
+          It is designed for executive planning and governance review, not individual-level actioning.
+        </p>
+
+        <div class="kvs">
+          <div class="kv">
+            <div class="k">Primary decision</div>
+            <div class="v">Will HR demand exceed sustainable capacity, and what interventions prevent operational risk?</div>
+          </div>
+          <div class="kv">
+            <div class="k">Key metric</div>
+            <div class="v">Worst-week utilization, plus cumulative gap hours and role-period utilization</div>
+          </div>
+          <div class="kv">
+            <div class="k">Repository</div>
+            <div class="v">
+              <a href="https://github.com/ryanbrush30/hrcapacity" target="_blank" rel="noopener noreferrer">
+                github.com/ryanbrush30/hrcapacity
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <h2>Sample artifacts</h2>
+        <p>
+          The files below demonstrate the artifact set produced by a validated run. These are examples for review.
+          They are aggregated and governance-safe.
+        </p>
+
+        <div class="links">
+          <a href="./artifacts_samples/run_example/scenario_summary.csv">Scenario summary (CSV)</a>
+          <a href="./artifacts_samples/run_example/totals.csv">Totals (CSV)</a>
+          <a href="./artifacts_samples/run_example/utilization_by_role_period.csv">Utilization by role and period (CSV)</a>
+          <a href="./artifacts_samples/run_example/manifest.json">Manifest (JSON)</a>
+        </div>
+
+        <div class="note">
+          Tip: If any links 404, confirm the folder names match your repo. GitHub Pages is case-sensitive.
+        </div>
+
+        <div class="hr"></div>
+
+        <h2>Executive guide: how to read the sample artifacts</h2>
+        <p>
+          These outputs represent a validated HR Capacity Model run. They are intended to support leadership decisions
+          about sustainable HR capacity, timing of service pressure, and which interventions reduce operational risk.
+          They are not intended for individual employee actioning.
+        </p>
+
+        <div class="exec">
+          <h3>Start here: Scenario summary</h3>
+          <div class="filetag">File: scenario_summary.csv</div>
+          <ul>
+            <li><strong>Worst-week utilization</strong>: the most decision-relevant metric. Peak overload drives service delays and operational risk more than average utilization.</li>
+            <li><strong>Total gap hours</strong>: cumulative demand that cannot be serviced within sustainable capacity. Proxy for backlog growth and delay risk.</li>
+            <li><strong>Interpretation</strong>: lower is better for both. Scenarios that reduce the peak usually reduce risk more than scenarios that only improve totals.</li>
+          </ul>
+
+          <h3>Then review: Utilization by role and period</h3>
+          <div class="filetag">File: utilization_by_role_period.csv</div>
+          <ul>
+            <li>Identify the constrained roles and timing patterns (short peak vs sustained pressure).</li>
+            <li>Confirm whether interventions reduce load or shift burden to other roles.</li>
+            <li><strong>Leadership use</strong>: prioritize targeted capacity adds, sequencing changes, or demand moderation policies.</li>
+          </ul>
+
+          <h3>Totals</h3>
+          <div class="filetag">File: totals.csv</div>
+          <ul>
+            <li>High-level summary of aggregate demand vs sustainable capacity over the planning horizon.</li>
+            <li>Use totals to explain magnitude. Use worst-week utilization to determine when it becomes operationally dangerous.</li>
+          </ul>
+
+          <h3>Manifest</h3>
+          <div class="filetag">File: manifest.json</div>
+          <ul>
+            <li>Governance and audit record: run metadata, input fingerprinting, resolved configuration hash.</li>
+            <li>Declared governance constraints and prohibited uses to prevent misuse and ensure traceability.</li>
+            <li><strong>Leadership use</strong>: ensures results can be trusted and reproduced without spreadsheet drift.</li>
+          </ul>
+
+          <h3>Decision logic for executives</h3>
+          <ul>
+            <li>Do we exceed sustainable capacity at any point in the planning horizon?</li>
+            <li>Which scenario reduces worst-week utilization the most with minimal operational disruption?</li>
+            <li>Does the scenario reduce pressure in the constrained role, or does it only shift burden elsewhere?</li>
+            <li>Are the interventions realistic to execute and governance-safe in intended use?</li>
+          </ul>
+        </div>
+      </section>
+
+      <aside class="card">
+        <h2>Repository contents</h2>
+        <p>Included here for transparency and review:</p>
+        <ul>
+          <li>Data input templates (CSV)</li>
+          <li>Curated sample outputs</li>
+          <li>Product framing and governance statements</li>
+        </ul>
+
+        <p><strong>Intentionally excluded:</strong></p>
+        <ul>
+          <li>Source code and execution engine</li>
+          <li>Production decision configurations</li>
+          <li>Full scenario catalog and tuning parameters</li>
+        </ul>
+
+        <div class="hr"></div>
+
+        <h2>Data templates</h2>
+        <p>These CSVs show the expected input structure for licensed deployments.</p>
+        <div class="links">
+          <a href="./data/workforce_forecast.csv">workforce_forecast.csv</a>
+          <a href="./data/capacity_schedule.csv">capacity_schedule.csv</a>
+          <a href="./data/events_config.csv">events_config.csv</a>
+          <a href="./data/fixed_event_counts.csv">fixed_event_counts.csv</a>
+          <a href="./data/routing_matrix.csv">routing_matrix.csv</a>
+        </div>
+
+        <div class="hr"></div>
+
+        <h2>Licensing</h2>
+        <p>
+          This repository does not grant rights to reproduce, reimplement, or derive a competing system.
+          Licensed access may include the execution engine, production configs, and scenario catalogs.
+        </p>
+
+        <div class="cta">
+          <a class="btn" href="https://github.com/ryanbrush30/hrcapacity" target="_blank" rel="noopener noreferrer">Repository</a>
+          <a class="btn" href="./README.md">README</a>
+        </div>
+      </aside>
+    </div>
+
+    <p class="foot">
+      Intellectual property notice: The HR Capacity Model execution engine is proprietary and not included.
+      Artifacts and templates in this repository are provided for review and licensed decision support only.
+    </p>
+  </div>
+</body>
+</html>
